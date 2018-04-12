@@ -1,0 +1,21 @@
+sdat.rings.ch0:
+	hummerSpeed	1
+	hummerAlterNote	$1E
+	db $F9,$5B
+	db $FA,$5C
+	db $F8,$5D
+	db $83,$30,$34,$37,$8C,$3B
+	hummerStop
+
+sdat.rings.ch1:
+	hummerAlterNote	$1E
+	db $F9,$5B
+	db $FA,$5C
+	db $F8,$5D
+	db $83,$30,$30,$34,$37,$8C,$3B
+	hummerStop
+
+sptr.rings: ; 9d83
+	sfxChannel 0, sdat.rings.ch0
+	sfxChannel 1, sdat.rings.ch1
+	hummerStop
