@@ -23,7 +23,7 @@ def ReadSheet(fn, name, base, e, nc):
  c=0	# mode set
  	# 0 = regular
  	# 1 = header mode
- d=0	# song num.
+ d=""	# song num.
  print("mdat."+name+str(d)+".ch"+str(b)+":","\t;", hex(int.from_bytes(base,'big')) )
  with open(fn,'rb') as a:
   a.seek(0,2)
@@ -40,16 +40,25 @@ def ReadSheet(fn, name, base, e, nc):
    if c == 0: # Normal mode
     #00
     if x == 0:
-     print("\t.db nRst")
+     print("\tdb nRst")
 
    #09-47
     elif 9 <= x <= 71:
-      print("\t.db", notenames[x-9])
+     print("\tdb", notenames[x-9])
 
    #80-df
     elif 129 <= x <= 223:
      q=int.from_bytes(p,'big')
      print("\thummerNoteLength",q-128)
+
+   #f0
+    elif x == 240:
+     q=int.from_bytes(a.read(2),'little')
+     print("\thummerCall","$"+hex(q)[2:])
+
+   #f1
+    elif x == 241:
+     print("\thummerReturn")
 
    #f4
     elif x == 244:
@@ -93,7 +102,7 @@ def ReadSheet(fn, name, base, e, nc):
       c=1
    ###
     else:
-     print("\t.db",x)
+     print("\tdb",x)
 
    else:  # Header mode
           # this strictly follows the Hummer Team music data convention
@@ -108,7 +117,10 @@ def ReadSheet(fn, name, base, e, nc):
     else:
      q=int.from_bytes(a.read(2),'little')
      if q:
-      print("\tmusicChannel",str(x)+",","$"+hex(q)[2:])
+      if 0 <= x <= 127:
+       print("\tmusicChannel",str(x)+",","$"+hex(q)[2:])
+      else:
+       print("\tsfxChannel",str(x-128)+",","$"+hex(q)[2:])
 #===============================================================================
 
 if len(sys.argv) < 4:

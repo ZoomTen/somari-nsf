@@ -20,7 +20,7 @@ Header:
 	.db 26		; num. songs
 	.db 1		; starting song
 
-	.dw Start	; Load
+	.dw SE_SFXTable	; Load
 	.dw Init	; Init
 	.dw Play	; Play
 
@@ -47,22 +47,22 @@ Header:
 ; Start of program
 	$=$8000
 	.org $8000
-Start:
+SE_SFXTable:
 	; This appears to be the SFX header pointers.
 	; Located at 0x34010 in the ROM (0D:8000)
 	.dw +		; silence
 ; SFX
-	.db $5E, $9D	; skidding
+	.dw sptr.skid	; skidding
 	.dw sptr.rings	; rings
-	.db $9F, $9D	; jump
-	.db $C9, $9D	; direct hit
-	.db $DD, $9D	; badnik explosion
-	.db $EE, $9D	; ???
-	.db $00, $9E	; bubble?
-	.db $1A, $9E	; dash
-	.db $2B, $9E	; explosion
-	.db $3E, $9E	; checkpoint? is this unused?
-	.db $4F, $9E	; possibly switch?
+	.dw sptr.jump	; jump
+	.dw sptr.hit	; direct hit
+	.dw sptr.explode; badnik explosion
+	.dw sptr.06	; ???
+	.dw sptr.bubble	; bubble
+	.dw sptr.dash	; dash
+	.dw sptr.boom	; explosion
+	.dw sptr.0A	; checkpoint? is this unused?
+	.dw sptr.0B	; possibly switch?
 	.dw +		; silence
 	.dw +
 	.dw +
@@ -88,16 +88,16 @@ Start:
 	.dw mptr.invincible	; invincibility
 	.dw mptr.actclear	; stage clear
 	.dw mptr.ghz		; GHZ
-	.db $02, $8F		; MZ
-	.db $56, $92		; SYZ
-	.db $DB, $94		; LZ
-	.db $A6, $97		; SLZ
-	.db $3F, $99		; bonus stage
-	.db $D2, $9A		; boss
-	.db $07, $9C		; countdown
-	.db $8C, $9C		; game over
-	.db $ED, $9C		; chaos emerald (unused)
-	.db $41, $9D		; +continues (unused)
+	.dw mptr.mz		; MZ
+	.dw mptr.syz		; SYZ
+	.dw mptr.lz		; LZ
+	.dw mptr.slz		; SLZ
+	.dw mptr.special	; bonus stage
+	.dw mptr.robotnik	; boss
+	.dw mptr.countdown	; drowning
+	.dw mptr.gameover	; game over
+	.dw mptr.emerald	; chaos emerald (unused)
+	.dw mptr.continue	; +continues (unused)
 ; Absolute silence
 +	musicChannel 0, ++
 	musicChannel 1, ++
@@ -114,20 +114,27 @@ Start:
 	include "include/instrument_data.asm"
 
 ; == Music == ;.org $8800
-	include "music/20_title.hummer"
-	include "music/21_invinc.hummer"
-	include "music/22_act_clear.hummer"
-	include "music/23_ghz.hummer"
-	include "music/24_mzwip.hummer"
-	incbin "wip/8a50.bin",1218
+	include "sounds/20_title.asm"
+	include "sounds/21_invinc.asm"
+	include "sounds/22_act_clear.asm"
+	include "sounds/23_ghz.asm"
+	include "sounds/24_mz.asm"
+	include "sounds/25_syz.asm"
+	include "sounds/26_lz.asm"
+	include "sounds/27_slz.asm"
+	include "sounds/28_special.asm"
+	include "sounds/29_boss.asm"
+	include "sounds/2A_countdown.asm"
+	include "sounds/2B_gameover.asm"
+	include "sounds/2C_emerald.asm"
+	include "sounds/2D_continue.asm"
 
 ; == SFX == ;.org $9D51
-	include "sfx/01_skid.hummer"	; WIP
-	include "sfx/02_ring.hummer"
-	include "sfx/03_jump.hummer"	; WIP
-	incbin "wip/9da3.bin"
+	include "sounds/sfx.asm"
 
-; ".hummer" files are just standard asm files
+Unknown_9E53: ; This isn't really relevant
+	incbin "wip/9da3+x.bin"
+
 
 ; ==============================================================================
 ;	.org $B100
@@ -582,9 +589,9 @@ asm.B403:
 	TXA
 	ASL A
 	TAX
-	LDA $8000,X
+	LDA SE_SFXTable,X		; SFX TABLE CALL
 	STA $FE
-	LDA $8001,X
+	LDA SE_SFXTable+1,X
 	STA $FF
 	LDY #$00
 
@@ -1234,9 +1241,9 @@ asm.B906:
 	ASL A
 	TAY
 	LDX $070C
-	LDA $8100,Y
+	LDA SE_NoteTable,Y		; Note table!!
 	STA v_current_notes,X
-	LDA $8101,Y
+	LDA SE_NoteTable+1,Y
 	STA $0744,X
 	JMP asm.B933
 asm.B921:
@@ -1269,10 +1276,10 @@ asm.B94A:
 	LDA $0757,X
 	ASL A
 	TAX
-	LDA $8200,X
+	LDA SE_SequenceTable,X
 	STA $0761,Y
 	STA $FE
-	LDA $8201,X
+	LDA SE_SequenceTable+1,X
 	STA $0762,Y
 	STA $FF
 	LDX $070B
@@ -1292,10 +1299,10 @@ asm.B97B:
 	LDA $076B,X
 	ASL A
 	TAX
-	LDA $8200,X
+	LDA SE_SequenceTable,X
 	STA $076F,Y
 	STA $FE
-	LDA $8201,X
+	LDA SE_SequenceTable+1,X
 	STA $0770,Y
 	STA $FF
 	LDX $070B
@@ -1315,10 +1322,10 @@ asm.B9AC:
 	LDA $0773,X
 	ASL A
 	TAX
-	LDA $8200,X
+	LDA SE_SequenceTable,X
 	STA $077B,Y
 	STA $FE
-	LDA $8201,X
+	LDA SE_SequenceTable+1,X
 	STA $077C,Y
 	STA $FF
 	LDX $070B
@@ -1351,7 +1358,7 @@ asm.B9F2:
 	LDA data.BA01+1,X
 	STA $FF
 	JMP ($00FE)
-data.BA01:		; I think it's a call table of some sorts
+data.BA01:		; XXX: what's this call table for?
 	.dw asm.BA21
 	.dw asm.BA4F
 	.dw asm.BA69
@@ -1658,8 +1665,14 @@ asm.BC8F:
 	STA $072A,X
 	JMP asm.B89D
 
-Filler:	; this data seems unused
-	.db $A0, $A0, $A0, $A0, $C0, $C0, $C0, $C0, $C0, $C0, $C0, $C0, $E0, $E0, $E0, $E0, $E0, $E0, $E0, $E0, $00, $00, $00, $00, $00, $00, $00, $00, $20, $20, $20, $20, $20, $20, $20, $20, $40, $40, $40, $40, $40, $40, $40, $40, $60, $60, $60, $60, $60, $60, $60, $60, $80, $80, $80, $80, $80, $80, $80, $80, $A0, $A0, $A0, $A0, $A0, $A0, $A0, $A0, $C0, $C0, $C0, $C0, $C0, $C0, $C0, $C0, $E0, $E0, $E0, $E0, $E0, $E0, $E0, $E0
+Unknown_BCAC:	; this data seems unused
+	.db $A0, $A0, $A0, $A0, $C0, $C0, $C0, $C0, $C0, $C0, $C0, $C0, $E0
+	.db $E0, $E0, $E0, $E0, $E0, $E0, $E0, $00, $00, $00, $00, $00, $00
+	.db $00, $00, $20, $20, $20, $20, $20, $20, $20, $20, $40, $40, $40
+	.db $40, $40, $40, $40, $40, $60, $60, $60, $60, $60, $60, $60, $60
+	.db $80, $80, $80, $80, $80, $80, $80, $80, $A0, $A0, $A0, $A0, $A0
+	.db $A0, $A0, $A0, $C0, $C0, $C0, $C0, $C0, $C0, $C0, $C0, $E0, $E0
+	.db $E0, $E0, $E0, $E0, $E0, $E0
 
 
 ; ==============================================================================

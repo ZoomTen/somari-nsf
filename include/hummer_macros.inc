@@ -9,6 +9,21 @@
 		.dw x
 	ENDM
 
+; F1 - End of subroutine
+	MACRO hummerReturn
+		.db $F1
+	ENDM
+
+; F2 - Unknown
+	MACRO hummerF2
+		.db $F2
+	ENDM
+
+; F3 - Unknown
+	MACRO hummerF3
+		.db $F3
+	ENDM
+
 ; F4xxxx - Jump to xxxx
 	MACRO hummerJump x
 		.db $F4
@@ -26,11 +41,17 @@
 		.db $F6, x
 	ENDM
 
-; 8x,9x,Ax - Set length of a single note
+; 8x,9x,...,Ex - Set length of a single note
 ;            Roughly the equivalent of row gaps between notes in FamiTracker
 	MACRO hummerNoteLength x
 		.db $80+x
 	ENDM
+
+; F7 - Unknown
+	MACRO hummerF7
+		.db $F7
+	ENDM
+
 
 ; F8xx - Volume modulation table index (in $8200)
 	MACRO hummerADSR x
@@ -47,7 +68,27 @@
 		.db $FA, x
 	ENDM
 
-; F2 - End of channel
+; FB - Unknown
+	MACRO hummerFB
+		.db $FB
+	ENDM
+
+; FC - Unknown
+	MACRO hummerFC
+		.db $FC
+	ENDM
+
+; FD - Unknown
+	MACRO hummerFD
+		.db $FD
+	ENDM
+
+; FE - Unknown
+	MACRO hummerFE
+		.db $FE
+	ENDM
+
+; FF - End of channel
 	MACRO hummerStop x
 		.db $FF
 	ENDM
