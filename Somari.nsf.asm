@@ -2,11 +2,12 @@
 
 ; ==============================================================================
 ; Somari.nsf Disassembly
-; Hummer / Somari Sound Engine r2
-; (c) 1992- Copyright/Hummer Team/Somari Team
+; Hummer / Somari / Athena Sound Engine sample
+; (c) 1992- Athena / Hummer Cheng(Yi Zheng)
 ;
 ; ZoomTen 2018/04
-; Work in progress
+; Work in progress disasm
+; NON COMMERCIAL USE
 ; ==============================================================================
 
 	include "include/hummer_macros.inc"
